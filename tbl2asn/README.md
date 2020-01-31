@@ -1,7 +1,6 @@
 Last Updated: 2020-01-31T08:51:55-05:00
 
 #### Mac
-MD5:595c883f54650186575d28a08d86130c
 ```
 wget https://anaconda.org/bioconda/tbl2asn/25.7/download/osx-64/tbl2asn-25.7-0.tar.bz2
 md5sum tbl2asn-25.7-0.tar.bz2
