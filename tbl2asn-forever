@@ -1,6 +1,14 @@
 #!/bin/bash
 VERSION=25.7f
 set -euo pipefail
-LD_PRELOAD=${CONDA_PREFIX}/lib/faketime/libfaketime.so.1 \ 
-FAKETIME="2019-01-01 00:00:01" \
-${CONDA_PREFIX}/bin/real-tbl2asn $*
+if [ -z ${CONDA_PREFIX+x} ]; then
+  # Conda test
+  LD_PRELOAD=${PREFIX}/lib/faketime/libfaketime.so.1 \
+    FAKETIME="2019-01-01 00:00:01" \
+    ${PREFIX}/bin/real-tbl2asn $*
+else
+  # Conda build
+  LD_PRELOAD=${CONDA_PREFIX}/lib/faketime/libfaketime.so.1 \
+    FAKETIME="2019-01-01 00:00:01" \
+    ${CONDA_PREFIX}/bin/real-tbl2asn $*
+fi
