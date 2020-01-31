@@ -1,4 +1,6 @@
 #!/bin/bash
 VERSION=25.7f
 set -euo pipefail
-FAKETIME="2019-01-01 00:00:01" `which real-tbl2asn` $*
+LD_PRELOAD=${CONDA_PREFIX}/lib/faketime/libfaketime.so.1 \ 
+FAKETIME="2019-01-01 00:00:01" \
+${CONDA_PREFIX}/bin/real-tbl2asn $*
