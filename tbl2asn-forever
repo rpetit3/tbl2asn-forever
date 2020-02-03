@@ -1,8 +1,32 @@
 #!/bin/bash
-VERSION=25.7f
 set -euo pipefail
+VERSION="27.7.1f"
+TBL2ASN_DATE="01-JAN-2019"
+CURRENT_DATE=`date +%d-%b-%Y | tr '[:lower:]' '[:upper:]'`
 FAKETIME_PATH=`which tbl2asn | sed 's=bin/tbl2asn=lib/faketime/libfaketime.so.1='`
 
 LD_PRELOAD=${FAKETIME_PATH} \
   FAKETIME="2019-01-01 00:00:01" \
   real-tbl2asn "${@:1}"
+
+if [[ "$*" != *"--help"* ]]; then
+  if [[ "$*" == *"prokka"* ]]; then
+    # Correct the date in the resulting GBF and SQN files
+    echo "[tbl2asn-forever] Found Prokka input, correcting dates in .gbf|.sqn files."
+    for i in "${@:1}"; do
+      if [[ "$i" == *".fsa" ]]; then
+        BASENAME="${i%.*}"
+        echo "[tbl2asn-forever] Correcting dates in ${BASENAME}.gbf" 
+        sed -i -r 's/'"${TBL2ASN_DATE}"'/'"${CURRENT_DATE}"'/' ${BASENAME}.gbf
+
+        echo "[tbl2asn-forever] Correcting dates in ${BASENAME}.sqn"
+        mv ${BASENAME}.sqn ${BASENAME}.sqn.bak
+        fix-sqn-date ${BASENAME}.sqn.bak > ${BASENAME}.sqn
+        rm ${BASENAME}.sqn.bak
+      fi
+    done
+    echo "[tbl2asn-forever] Dates changed from ${TBL2ASN_DATE} to ${CURRENT_DATE}" 
+  else
+    echo "[tbl2asn-forever] WARNING: .gbf|.sqn files have incorrect date (${TBL2ASN_DATE}) and will need to be corrected."
+  fi
+fi
