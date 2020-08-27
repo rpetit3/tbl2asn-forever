@@ -1,13 +1,21 @@
 #!/bin/bash
-set -euo pipefail
-VERSION="27.7.1f"
+
+VERSION="25.7.2f"
 TBL2ASN_DATE="01-JAN-2019"
 CURRENT_DATE=`date +%d-%b-%Y | tr '[:lower:]' '[:upper:]'`
-FAKETIME_PATH=`which tbl2asn | sed 's=bin/tbl2asn=lib/faketime/libfaketime.so.1='`
 
-LD_PRELOAD=${FAKETIME_PATH} \
-  FAKETIME="2019-01-01 00:00:01" \
-  real-tbl2asn "${@:1}"
+if [[ $OSTYPE == darwin* ]]; then
+    DYLD_FORCE_FLAT_NAMESPACE=1 \
+      DYLD_INSERT_LIBRARIES=`which tbl2asn | sed 's=bin/tbl2asn=lib/faketime/libfaketime.1.dylib='` \
+      FAKETIME="2019-01-01 00:00:01" real-tbl2asn "${@:1}"
+elif [[ $OSTYPE == linux* ]]; then
+    FAKETIME_PATH=`which tbl2asn | sed 's=bin/tbl2asn=lib/faketime/libfaketime.so.1='`
+    LD_PRELOAD=${FAKETIME_PATH} \
+      FAKETIME="2019-01-01 00:00:01" real-tbl2asn "${@:1}"
+else
+    echo "Unsupported OS: $OSTYPE"
+    exit 1
+fi
 
 if [[ "$*" != *"--help"* ]]; then
   if [[ "$*" == *"prokka"* ]]; then
