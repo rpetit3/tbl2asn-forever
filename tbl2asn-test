@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if tbl2asn --help 2>&1 | grep "more than a year old"; then
+    echo "Failed to alter date for tbl2asn." 1>&2
+    exit 1
+else
+    echo "Successfully altered date for tbl2asn." 1>&2
+    exit 0
+fi
